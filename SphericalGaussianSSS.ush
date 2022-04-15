@@ -19,7 +19,7 @@ half SharpenShadow(half shadow, float sharpeness)
 half CaculateDirectionCurveture(half3 tangent, half3 bitangent, half3 lightDir, half3 curvTensor)
 {
   half2 lightDirProj = half2(dot(lightDir, tangent), dot(lightDir, bitangent));
-  return 1;
+  return curvTensor.x * Pow2(lightDirProj.x) + 2 * curvTensor.y * lightDirProj.x * lightDirProj.y + curvTensor.z * Pow2(lightDirProj.y);
 }
 
 FSphericalGaussian MakeSG(half3 lightDir, half sharpness)
