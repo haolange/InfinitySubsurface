@@ -34,6 +34,7 @@ FSphericalGaussian MakeSG(half3 lightDir, half sharpness)
 
 half DotCosineLobe(half NoL, half sharpness)
 {
+  NoL *= 0.5;
   half c0 = 0.36;
   half c1 = 0.25 / c0;
 
@@ -43,6 +44,7 @@ half DotCosineLobe(half NoL, half sharpness)
 
   half scale = 1 + 2 * em2l - rl;
   half bias = (eml - em2l) * rl - em2l;
+  bias += NoL;
 
   half x = sqrt(1 - scale);
   half x0 = c0 * NoL;
@@ -51,7 +53,7 @@ half DotCosineLobe(half NoL, half sharpness)
   half n = x0 + x1;
   half y = (abs(x0) <= x1) ? n * n / x : saturate(NoL);
 
-  return scale * y + bias;
+  return saturate(scale * y + bias);
 }
 
 void CalculateNormalsForSGLight(half sharpNormal, half3 normalFactor, half3 shadeNormal, half3 bentNormal, out FSSSNormal sssNormal)
@@ -75,7 +77,7 @@ half3 SphericalGaussianSubsurface(half3 lightDir, FSSSNormal sssNormal, half3 sc
 half3 SphericalGaussianShadow(half shadow, half3 scatterColor)
 {
   half3 diffuse = half3(DotCosineLobe(shadow, rcp(max(scatterColor.x, 0.0001f))), DotCosineLobe(shadow, rcp(max(scatterColor.y, 0.0001f))), DotCosineLobe(shadow, rcp(max(scatterColor.z, 0.0001f))));
-  half3 X = max(0, diffuse - 0.004);
-  diffuse = (X * (6.2 * X + 0.5)) / (X * (6.2 * X + 1.7) + 0.06);
-  return saturate(Pow2(diffuse) * 1.5);
+  /*half3 X = max(0, diffuse - 0.004);
+  diffuse = (X * (6.2 * X + 0.5)) / (X * (6.2 * X + 1.7) + 0.06);*/
+  return diffuse;
 }
